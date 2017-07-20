@@ -5,12 +5,11 @@ var contract = require('./contractDetails');
 
 var web3_extended = require('web3_extended');
 var path = require('path');
-var absolutePath =  path.relative('./','/home/pr.singh/.ethereum/geth.ipc');
+var absolutePath =  path.relative('./','/root/.ethereum/geth.ipc');
 var TransactionService = require('./../services/transaction.service');
 var Transaction = require('./../models/transaction.model');
 console.log(absolutePath);
 var options = {
-  //host : absolutePath,	
   host: ' http://localhost:8012',
   ipc : false,
   personal: true, 
@@ -23,14 +22,14 @@ var web3 = web3_extended.create(options);
 var contractAddress= "0x43C3d9220AbAF159323bFD4aB746a52527a2D17e";
 
 exports.checkEthBalance = function(req, res) {
-	console.log("check balanace");
+	console.log("check balance");
 	console.log(req.body);
 	var accountAddr = req.body.accountAddress;
 	//var accountAddr = "0x62720366ef403c9891e2bfbd5358ee3c8a57b113";
 	if(isAddress(accountAddr)==false){
 		console.log("This address is not valid");
 		//return res.json({error:true ,  message: "Invalid address"});
-		return res.json({"success":"false","data":[{"message":"Inavlid address"}]});
+		return res.json({"success":"false","data":[{"message":"Invalid address"}]});
 
 	}
 	var ethBalance=web3.eth.getBalance(accountAddr).toNumber(); 
@@ -38,30 +37,6 @@ exports.checkEthBalance = function(req, res) {
 	//return res.json({error:"false", balance: ethBalanceethBalance, message:"Success"});
 	console.log(ethBalance);
 }
-
-
-// this is just giving "Invalid address" response of address is wrong
-/*exports.checkEthBalance = function(req, res) {
-	console.log("Inside check ether balanace");
-	var accountAddr = req.body.accountAddress;
-
-	web3.eth.getBalance(accountAddr, function(err,resp){
-		console.log("Errorrr "+err);
-		console.log("Resppp "+resp);
-		if(err){
-			console.log("Error is: "+err)
-		}
-		else{
-			console.log("Response is: "+resp)
-			var ethBalance = resp.toNumber();
-			return res.json({"success":"true","data":[{"balance": ethBalance}]});
-		}
-	})
-}*/
-
-
-
-
 
 exports.checkCoinBalance = function(req, res) {
 	console.log("check balanace");
@@ -253,83 +228,6 @@ exports.transferCoin = function(req, res) {
 		}	
 
 	}
-
-
-	// this is working code
-	/*exports.checkTransactionStatus= function(req, res){
-		var transactionId = req.body.transactionid;
-		console.log(transactionId);
-		var blockNumber = web3.eth.getTransaction(transactionId).blockNumber;
-		if(blockNumber == null )
-			return res.json({"success":"true", "data":[{"transactionStatus":"Pending"}]});
-		else
-			return res.json({"success":"true", "data":[{"transactionStatus":"Success"}]});
-		console.log(obj);
-		/*var status = obj[transactionId];
-		console.log(status);
-		return res.json({"success":"true", data:[{"transactionStatus":status}]})*/
-	//}
-			}
-
-
-
-
-/*
-function watchTransaction(tx){
-	console.log("Transaction ID : "+tx);
-	contract.Transfer(function(err,result){
-		if(!err){
-			if(result.transactionHash==tx){
-				console.log("success");
-				Transaction.findOne({transactionid : tx} , function(err, transaction) {
-					console.log("Trans updating : "+JSON.stringify(transaction));
-					if(err){
-						return "Error";
-					}
-					if(transaction != null && transaction != undefined){
-						transaction.update({status : "success"}, function(_err, _resp) {
-							return "Status updated";
-						});
-					}
-				});				
-			}
-		}
-	});
-}
-*/
-
-
-// watching transaction v2
-// watches transaction based on events. // depends on contract code
-// the function needs to be executed continuously
-// not yet tested
-/*function watchTransaction(){
-	console.log("Watching tx");
-	contract.Transfer(function(error, resp){
-		if(error){
-			console.log("Error in watching transaction");
-		}
-		else if (resp.blockNumber != null){  // perfom any operation only if transaction is  mined
-			var tx= resp.transactionHash;
-				console.log("transaction that is been watched is: "+tx);
-				Transaction.findOne({transactionid:tx},function(_err, _resp){
-					if(_err){
-						console.log("No matching tx found");
-					}
-					if(_resp != null && _resp != undefined){
-						Transaction.update({transactionid:tx}, {status:"Success"},function(_err1, _resp1){
-							console.log("Transaction: "+tx+" status updated succesfully." )
-						})
-					}
-
-		}) // tx.find one ends here
-
-	} // else ends here
-
-})
-}*/
-
-
 
 // another approach to checkTransaction status - V3
 // this function will update status fo all pending transactions. You can call this function after every n seconds and it will update the db.
